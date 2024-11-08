@@ -479,6 +479,7 @@ public class re {
 - s5.germmc.com
 - s6.germmc.com
 - s7.germmc.com
+
 以及泄露的关键信息为，其加密密钥为``?:P)(OL><KI*&UJM785^%TGB416$#EDCXSW@!QAZ``(萌芽Cache也使用该密钥进行加解密)，想要修改IP限制，参考项目 https://github.com/PillowFrame/GermModHideInfoExtracter
 
 3.材质包加密原理
